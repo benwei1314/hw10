@@ -1,7 +1,6 @@
 #include <Adafruit_MotorShield.h>
 #include <IRremote.h>
-#define up FF629D
-#define down FFA857
+
 
 int RECV_PIN = 12;
 IRrecv irrecv(RECV_PIN);
@@ -35,7 +34,7 @@ void forward() {
 }
 
 void backward() {
-  Serial.print("Moving forward...");
+  Serial.print("Moving backward...");
   leftMotor->run(BACKWARD);
   rightMotor->run(BACKWARD);
   delay(1000);
@@ -44,24 +43,60 @@ void backward() {
   Serial.println("Stopped");
 }
 
+void left() {
+  Serial.print("Moving left...");
+  leftMotor->run(RELEASE);
+  rightMotor->run(BACKWARD);
+  delay(500);
+  leftMotor->run(RELEASE);
+  rightMotor->run(RELEASE);
+  Serial.println("Stopped");
+}
+
+void right() {
+  Serial.print("Moving right...");
+  leftMotor->run(BACKWARD);
+  rightMotor->run(RELEASE);
+  delay(500);
+  leftMotor->run(RELEASE);
+  rightMotor->run(RELEASE);
+  Serial.println("Stopped");
+}
+
 void loop() {
-  char c = Serial.read();
-   if (irrecv.decode(&results)) {
-    Serial.println(results.value,HEX);
+  if (irrecv.decode(&results)) {
+    Serial.println(results.value);
+
+    if (results.value == 16754775)
+    {
+      forward();
+    }
+
+if (results.value == 16736925)
+ {
+  backward();
+ }
+if (results.value == 16720605)
+ {
+  left();
+ }
+ if (results.value == 16761405 )
+ {
+  right();
+ }
     irrecv.resume();
-  
-   }
-  if (c == 'up') {
+
+  }
+
+
+  char c = Serial.read();
+
+  if (c == 'f') {
     forward();
-
-    
   }
-  delay(100);
-   
-   if (c == 'down') {
+
+  if (c == 'b') {
     backward();
+  }
 
-     irrecv.resume();
-  }
-  delay(100);
-  }
+}
